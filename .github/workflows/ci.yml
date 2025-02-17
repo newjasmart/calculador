@@ -1,0 +1,51 @@
+name: CI for Angular Project
+
+# On déclenche cette action pour chaque push ou pull request sur la branche main
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # On utilise un runner Ubuntu
+
+    # On définit les différentes étapes à exécuter dans ce job
+    steps:
+      # 1. Récupère le code du repo
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # 2. Configure Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'  # Spécifie la version de Node.js
+
+      # 3. Installe les dépendances
+      - name: Install dependencies
+        run: npm install
+
+      # 4. Exécute les tests avec Karma
+      - name: Run tests
+        run: npm run test -- --watch=false --browsers=ChromeHeadless
+
+      # 5. Build l'application en mode production
+      - name: Build the project
+        run: npm run build --prod
+
+  # Optionnel : déployer l'application si tu le souhaites, ici un job de déploiement par exemple
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build  # Ce job dépend du job build ci-dessus
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Ajoute ton script de déploiement ici si nécessaire
+      - name: Deploy to production
+        run: echo "Déploiement en production ici"
